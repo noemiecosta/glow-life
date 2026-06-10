@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0D14">
+<title>GlowLife ✦</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg:        #0D0D14;
+  --bg2:       #13131F;
+  --bg3:       #1A1A2E;
+  --card:      #16162A;
+  --card2:     #1E1E35;
+  --border:    rgba(255,255,255,0.07);
+  --gold:      #C9A84C;
+  --gold-dim:  rgba(201,168,76,0.18);
+  --gold-glow: rgba(201,168,76,0.35);
+  --lavender:  #8B7CC8;
+  --lav-dim:   rgba(139,124,200,0.18);
+  --rose:      #D4A5A5;
+  --rose-dim:  rgba(212,165,165,0.18);
+  --ivory:     #F5F0E8;
+  --ivory-dim: rgba(245,240,232,0.55);
+  --ivory-muted: rgba(245,240,232,0.35);
+  --green:     #7EC8A4;
+  --green-dim: rgba(126,200,164,0.18);
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+body {
+  background: var(--bg);
+  color: var(--ivory);
+  font-family: var(--font-body);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; min-height: 100dvh; }
+
+/* ─── NAV ─────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,13,20,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+.nav-tabs {
+  display: flex; gap: 2px;
+  background: var(--bg3);
+  border-radius: var(--r-sm);
+  padding: 3px;
+}
+.nav-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ivory-muted);
+  cursor: pointer;
+  transition: all .2s;
+  border: none; background: none;
+  letter-spacing: 0.02em;
+}
+.nav-tab.active {
+  background: var(--card2);
+  color: var(--ivory);
+}
+.nav-date {
+  font-size: 0.75rem;
+  color: var(--ivory-muted);
+  white-space: nowrap;
+}
+
+/* ─── MAIN ─────────────────────────────────────────────── */
+main { flex: 1; padding: 20px; max-width: 900px; margin: 0 auto; width: 100%; }
+
+/* ─── PAGE : TODAY ─────────────────────────────────────── */
+.today-header {
+  margin-bottom: 24px;
+}
+.today-header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 400;
+  color: var(--ivory);
+  line-height: 1.2;
+}
+.today-header h1 em {
+  font-style: italic;
+  color: var(--gold);
+}
+.today-subhead {
+  font-size: 0.82rem;
+  color: var(--ivory-muted);
+  margin-top: 4px;
+}
+
+/* Progress ring */
+.progress-ring-wrap {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.progress-ring-svg { flex-shrink: 0; }
+.ring-track { fill: none; stroke: var(--bg3); stroke-width: 5; }
+.ring-fill  { fill: none; stroke: var(--gold); stroke-width: 5; stroke-linecap: round;
+  transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);
+  transform: rotate(-90deg); transform-origin: 50% 50%; }
+.ring-text-main { font-family: var(--font-display); font-size: 20px; fill: var(--ivory); dominant-baseline: middle; text-anchor: middle; }
+.ring-text-sub  { font-size: 9px; fill: var(--ivory-muted); dominant-baseline: middle; text-anchor: middle; }
+.ring-info h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 400; }
+.ring-info p { font-size: 0.8rem; color: var(--ivory-muted); margin-top: 4px; }
+.ring-streak {
+  margin-top: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--gold-dim); border: 1px solid var(--gold-glow);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 0.75rem; color: var(--gold);
+}
+
+/* Sections */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ivory-muted);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.habit-card {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all .18s;
+  user-select: none;
+  position: relative; overflow: hidden;
+}
+.habit-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold-dim); opacity: 0;
+  transition: opacity .18s;
+}
+.habit-card:hover::before { opacity: 1; }
+.habit-card.done {
+  border-color: rgba(126,200,164,0.3);
+  background: var(--green-dim);
+}
+.habit-card.done::before { background: transparent; }
+.habit-icon { font-size: 1.2rem; flex-shrink: 0; position: relative; }
+.habit-label { font-size: 0.82rem; line-height: 1.3; position: relative; }
+.habit-card.done .habit-label { color: var(--green); }
+.habit-check {
+  margin-left: auto; flex-shrink: 0; position: relative;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .18s;
+}
+.habit-card.done .habit-check {
+  background: var(--green);
+  border-color: var(--green);
+  color: #0D0D14;
+}
+
+/* Weekly habits schedule */
+.week-schedule { margin-bottom: 24px; }
+.week-days { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.week-day-btn {
+  flex: 1; min-width: 36px; max-width: 60px;
+  padding: 8px 4px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ivory-muted);
+  font-size: 0.7rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all .18s;
+}
+.week-day-btn.today-day {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.week-day-btn.has-habits { background: var(--lav-dim); border-color: rgba(139,124,200,0.3); }
+.week-day-btn .wd-name { font-weight: 600; display: block; }
+.week-day-btn .wd-num { font-size: 0.65rem; display: block; opacity: 0.7; margin-top: 1px; }
+
+.weekly-habit-assign {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.weekly-habit-name { font-size: 0.82rem; flex: 1; min-width: 120px; }
+.day-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+.day-pill {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--ivory-muted);
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-body);
+}
+.day-pill.selected {
+  background: var(--lavender);
+  border-color: var(--lavender);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Oneshot missions */
+.oneshot-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+.oneshot-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all .18s;
+}
+.oneshot-item:hover { border-color: rgba(201,168,76,0.3); }
+.oneshot-item.done { opacity: 0.5; text-decoration: line-through; }
+.oneshot-icon { font-size: 1rem; }
+.oneshot-label { font-size: 0.82rem; flex: 1; }
+.oneshot-date { font-size: 0.72rem; color: var(--rose); white-space: nowrap; }
+.oneshot-check {
+  width: 18px; height: 18px; border-radius: 4px;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; flex-shrink: 0; transition: all .15s;
+}
+.oneshot-item.done .oneshot-check { background: var(--gold); border-color: var(--gold); color: #0D0D14; }
+
+/* ─── PAGE : WEEK ──────────────────────────────────────── */
+.week-overview { margin-bottom: 32px; }
+.week-days-row { display: grid; grid-template-columns: repeat(7,1fr); gap: 6px; margin-bottom: 20px; }
+.wday-col {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 10px 8px;
+  min-height: 140px;
+  cursor: pointer;
+  transition: border-color .18s;
+}
+.wday-col.today-col { border-color: var(--gold); }
+.wday-col.selected-col { border-color: var(--lavender); background: var(--lav-dim); }
+.wday-name { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; color: var(--ivory-muted); margin-bottom: 2px; }
+.wday-num {
+  font-family: var(--font-display);
+  font-size: 1.4rem; font-weight: 400; line-height: 1;
+  margin-bottom: 8px;
+}
+.wday-col.today-col .wday-num { color: var(--gold); }
+.wday-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lavender); margin-bottom: 2px; }
+.wday-mini-habit { font-size: 0.6rem; color: var(--ivory-muted); margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wday-done-count { font-size: 0.62rem; color: var(--green); margin-top: 4px; }
+.wday-progress {
+  height: 3px; border-radius: 99px;
+  background: var(--bg3);
+  margin-top: 6px;
+  overflow: hidden;
+}
+.wday-progress-fill { height: 100%; background: var(--gold); border-radius: 99px; transition: width .4s; }
+
+/* ─── PAGE : MONTH ─────────────────────────────────────── */
+.month-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+}
+.month-header h2 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; }
+.month-nav-btn {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 14px;
+  color: var(--ivory); cursor: pointer; font-size: 0.82rem;
+  transition: border-color .18s; font-family: var(--font-body);
+}
+.month-nav-btn:hover { border-color: var(--gold); }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-header { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; color: var(--ivory-muted); text-align: center; padding: 6px 0; }
+.cal-day {
+  aspect-ratio: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: border-color .18s;
+  position: relative; overflow: hidden;
+}
+.cal-day.empty { background: transparent; border-color: transparent; cursor: default; }
+.cal-day.today { border-color: var(--gold); }
+.cal-day.other-month { opacity: 0.35; }
+.cal-day-num { font-size: 0.75rem; font-weight: 500; line-height: 1; }
+.cal-day.today .cal-day-num { color: var(--gold); font-weight: 700; }
+.cal-day-bar {
+  width: 70%; height: 3px;
+  border-radius: 99px; margin-top: 4px;
+  background: var(--bg3); overflow: hidden;
+}
+.cal-day-bar-fill { height: 100%; border-radius: 99px; transition: width .3s; }
+.cal-day-perc { font-size: 0.55rem; color: var(--ivory-muted); margin-top: 2px; }
+
+/* Stats cards */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 24px; }
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+.stat-card .stat-val { font-family: var(--font-display); font-size: 1.8rem; color: var(--gold); line-height: 1; }
+.stat-card .stat-label { font-size: 0.72rem; color: var(--ivory-muted); margin-top: 4px; }
+
+/* ─── BOTTOM NAV MOBILE ────────────────────────────────── */
+.bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13,13,20,0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+.bottom-nav-inner { display: flex; justify-content: space-around; }
+.bnav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px;
+  color: var(--ivory-muted);
+  cursor: pointer; border: none; background: none;
+  font-family: var(--font-body);
+  transition: color .18s;
+}
+.bnav-btn.active { color: var(--gold); }
+.bnav-icon { font-size: 1.2rem; }
+.bnav-label { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.04em; }
+
+/* ─── MISC ─────────────────────────────────────────────── */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px; border-radius: 20px;
+}
+.tag-beaute  { background: var(--rose-dim); color: var(--rose); }
+.tag-sport   { background: var(--green-dim); color: var(--green); }
+.tag-mental  { background: var(--lav-dim); color: var(--lavender); }
+.tag-sante   { background: rgba(126,200,164,0.15); color: var(--green); }
+.tag-growth  { background: var(--gold-dim); color: var(--gold); }
+.tag-relations { background: rgba(212,165,165,0.15); color: var(--rose); }
+.tag-finances { background: rgba(201,168,76,0.12); color: var(--gold); }
+.tag-maison  { background: rgba(139,124,200,0.12); color: var(--lavender); }
+
+.empty-state { text-align: center; color: var(--ivory-muted); padding: 40px 20px; font-size: 0.85rem; }
+
+/* ─── CONFETTI FLASH ───────────────────────────────────── */
+.confetti-flash {
+  position: fixed; inset: 0; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.confetti-flash span {
+  font-size: 3rem; opacity: 0;
+  animation: popFlash .6s ease forwards;
+}
+@keyframes popFlash {
+  0%   { opacity: 0; transform: scale(.4); }
+  50%  { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* ─── TOOLTIP ──────────────────────────────────────────── */
+[title] { cursor: help; }
+
+/* ─── RESPONSIVE ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  nav .nav-tabs { display: none; }
+  .bottom-nav { display: block; }
+  main { padding: 16px 12px 90px; }
+  .habits-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .week-days-row { grid-template-columns: repeat(7,1fr); gap: 3px; }
+  .wday-col { padding: 6px 4px; min-height: 100px; }
+  .wday-num { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ─── SCROLLBAR ────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <nav>
+    <div class="nav-logo">✦ GlowLife</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchPage('today')">Aujourd'hui</button>
+      <button class="nav-tab" onclick="switchPage('week')">Semaine</button>
+      <button class="nav-tab" onclick="switchPage('month')">Mois</button>
+    </div>
+    <div class="nav-date" id="nav-date-display"></div>
+  </nav>
+
+  <main id="main-content"></main>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <button class="bnav-btn active" onclick="switchPage('today')">
+        <span class="bnav-icon">✦</span><span class="bnav-label">Aujourd'hui</span>
+      </button>
+      <button class="bnav-btn" onclick="switchPage('week')">
+        <span class="bnav-icon">🗓</span><span class="bnav-label">Semaine</span>
+      </button>
+      <button class="bnav-btn" onclick="switchPage('month')">
+        <span class="bnav-icon">📆</span><span class="bnav-label">Mois</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
